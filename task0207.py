@@ -29,13 +29,14 @@ def visit(coord_raw, arcmin):
     print(coord_str)
 
     target_url = 'http://ned.ipac.caltech.edu/cgi-bin/objsearch?in_csys=Equatorial&in_equinox=J2000.0&lon={}&lat={}&radius={}&hconst=73&omegam=0.27&omegav=0.73&corr_z=1&search_type=Near+Position+Search&z_constraint=Unconstrained&z_value1=&z_value2=&z_unit=z&ot_include=ANY&nmp_op=ANY&out_csys=Equatorial&out_equinox=J2000.0&obj_sort=Distance+to+search+center&of=pre_text&zv_breaker=30000.0&list_limit=5&img_stamp=YES'.format(coord_str[0], coord_str[1], arcmin)
-    # print(target_url)
+    print(target_url)
 
     try:
         response = request.urlopen(target_url, timeout=20)
     except:
         print('Open URL Failed')
         return None
+    time.sleep(0.5)
 
     page = str(response.read())
 
@@ -43,7 +44,22 @@ def visit(coord_raw, arcmin):
         return None
 
     # print(page)
-    page = [_[:127] for _ in page.split('  </A>  ')[2:]]
+    for i in range(1, 999):
+        k = ['>', str(i)]
+        for i in range(3 - len(str(i))):
+            k.append(' ')
+        k.append('<')
+        f = ''.join(k)
+        # print(f)
+        if f in page:
+            # print('task')
+            page = page.replace(f, '')
+        else:
+            print(i)
+            break
+
+    page = [_[:127] for _ in page.split('ned_dw"/A>  ')[2:]]
+    print(len(page))
 
     for line in page:
 
